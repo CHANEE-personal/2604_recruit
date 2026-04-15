@@ -1,0 +1,71 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: subscription-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: subscription
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: subscription-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  customer-api:
+    build:
+      context: .
+      dockerfile: docker/prod/Dockerfile.customer-api
+    container_name: subscription-customer-api
+    profiles:
+      - app
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/subscription?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      DB_USERNAME: root
+      DB_PASSWORD: password
+      REDIS_HOST: redis
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-local-test-key}
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  admin-api:
+    build:
+      context: .
+      dockerfile: docker/prod/Dockerfile.admin-api
+    container_name: subscription-admin-api
+    profiles:
+      - app
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/subscription?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      DB_USERNAME: root
+      DB_PASSWORD: password
+      REDIS_HOST: redis
+    ports:
+      - "8081:8081"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  mysql-data:

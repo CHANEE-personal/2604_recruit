@@ -1,0 +1,27 @@
+package com.artinus.subscription.member.domain;
+
+import com.artinus.subscription.subscription.domain.SubscriptionStatus;
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@Builder
+public class Member {
+
+    private final Long id;
+    private final String phoneNumber;
+    private SubscriptionStatus subscriptionStatus;
+
+
+    public void updateStatus(SubscriptionStatus newStatus) {
+        this.subscriptionStatus = newStatus;
+    }
+
+
+    public static Member create(String phoneNumber) {
+        return Member.builder()
+                .phoneNumber(phoneNumber)
+                .subscriptionStatus(SubscriptionStatus.NONE)
+                .build();
+    }
+}

@@ -1,0 +1,109 @@
+name: Deploy Module (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      module:
+        description: '배포할 모듈명 (customer-api / admin-api)'
+        required: true
+        type: string
+
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.ap-northeast-2.amazonaws.com
+  ECR_REPOSITORY: 2603-be-recurit
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: gradle-
+
+      - name: Build with Gradle
+        run: ./gradlew :${{ inputs.module }}:build -x test
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get secrets from AWS Secrets Manager
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            prod/2603-be-recurit
+          parse-json-secrets: true
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker image
+        run: |
+          docker build -f docker/prod/Dockerfile.${{ inputs.module }} \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:${{ inputs.module }} .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ inputs.module }}
+
+      - name: Deploy via CodeDeploy
+        run: |
+          aws deploy create-deployment \
+            --region $AWS_REGION \
+            --cli-input-yaml file://docker/prod/code-deploy-${{ inputs.module }}.yaml
+
+      - name: Wait for CodeDeploy deployment
+        run: |
+          DEPLOYMENT_ID=$(aws deploy list-deployments \
+            --application-name 2603-be-recurit-${{ inputs.module }}-prod \
+            --deployment-group-name 2603-be-recurit-${{ inputs.module }} \
+            --query 'deployments[0]' \
+            --output text)
+
+          aws deploy wait deployment-successful \
+            --deployment-id $DEPLOYMENT_ID
+
+      - name: Slack notify on success
+        if: success()
+        uses: slackapi/slack-github-action@v1
+        with:
+          channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
+          slack-message: |
+            ✅ [prod] 2603-be-recurit/${{ inputs.module }} 배포 완료
+            Branch: ${{ github.ref_name }}
+            Actor: ${{ github.actor }}
+            Commit: ${{ github.sha }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+      - name: Slack notify on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1
+        with:
+          channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
+          slack-message: |
+            ❌ [prod] 2603-be-recurit/${{ inputs.module }} 배포 실패
+            Branch: ${{ github.ref_name }}
+            Actor: ${{ github.actor }}
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}

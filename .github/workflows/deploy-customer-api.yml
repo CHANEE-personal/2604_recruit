@@ -1,0 +1,16 @@
+name: Deploy customer-api
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'prod 배포 확인 (yes 입력)'
+        required: true
+
+jobs:
+  deploy:
+    if: github.event.inputs.confirm == 'yes'
+    uses: ./.github/workflows/_deploy-module.yml
+    with:
+      module: customer-api
+    secrets: inherit

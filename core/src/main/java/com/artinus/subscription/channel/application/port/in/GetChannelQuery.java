@@ -1,7 +1,7 @@
 package com.artinus.subscription.channel.application.port.in;
 
 import com.artinus.subscription.channel.domain.Channel;
-import com.artinus.subscription.channel.domain.ChannelType;
+import com.artinus.subscription.channel.domain.enums.ChannelType;
 import lombok.Builder;
 import lombok.Getter;
 

@@ -1,7 +1,7 @@
 package com.artinus.subscription.subscription.adapter.in;
 
 import com.artinus.subscription.subscription.application.port.in.ChangeSubscriptionCommand;
-import com.artinus.subscription.subscription.domain.SubscriptionStatus;
+import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

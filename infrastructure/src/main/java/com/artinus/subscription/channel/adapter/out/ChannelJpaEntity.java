@@ -1,6 +1,6 @@
 package com.artinus.subscription.channel.adapter.out;
 
-import com.artinus.subscription.channel.domain.ChannelType;
+import com.artinus.subscription.channel.domain.enums.ChannelType;
 import lombok.*;
 
 import jakarta.persistence.*;

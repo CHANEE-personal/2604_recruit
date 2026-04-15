@@ -1,4 +1,4 @@
-package com.artinus.subscription.subscription.domain;
+package com.artinus.subscription.subscription.domain.enums;
 
 public enum SubscriptionStatus {
 

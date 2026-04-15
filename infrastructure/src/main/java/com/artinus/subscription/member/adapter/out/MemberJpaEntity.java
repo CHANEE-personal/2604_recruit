@@ -1,6 +1,6 @@
 package com.artinus.subscription.member.adapter.out;
 
-import com.artinus.subscription.subscription.domain.SubscriptionStatus;
+import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
 import lombok.*;
 
 import jakarta.persistence.*;

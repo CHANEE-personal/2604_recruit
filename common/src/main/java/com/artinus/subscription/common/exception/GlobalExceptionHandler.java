@@ -1,5 +1,6 @@
 package com.artinus.subscription.common.exception;
 
+import com.artinus.subscription.common.exception.enums.ErrorCode;
 import com.artinus.subscription.common.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

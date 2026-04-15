@@ -1,8 +1,8 @@
 package com.artinus.subscription.subscription.application.port.in;
 
 import com.artinus.subscription.common.exception.BusinessException;
-import com.artinus.subscription.common.exception.ErrorCode;
-import com.artinus.subscription.subscription.domain.SubscriptionStatus;
+import com.artinus.subscription.common.exception.enums.ErrorCode;
+import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
 import lombok.Builder;
 import lombok.Getter;
 

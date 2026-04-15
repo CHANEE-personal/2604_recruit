@@ -1,4 +1,4 @@
-package com.artinus.subscription.channel.domain;
+package com.artinus.subscription.channel.domain.enums;
 
 public enum ChannelType {
 

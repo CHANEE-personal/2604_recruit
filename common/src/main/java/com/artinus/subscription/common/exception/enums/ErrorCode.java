@@ -1,4 +1,4 @@
-package com.artinus.subscription.common.exception;
+package com.artinus.subscription.common.exception.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

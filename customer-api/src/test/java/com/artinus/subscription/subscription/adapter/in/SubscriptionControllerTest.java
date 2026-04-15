@@ -2,11 +2,11 @@ package com.artinus.subscription.subscription.adapter.in;
 
 import com.artinus.subscription.common.config.MessageConfig;
 import com.artinus.subscription.common.exception.BusinessException;
-import com.artinus.subscription.common.exception.ErrorCode;
+import com.artinus.subscription.common.exception.enums.ErrorCode;
 import com.artinus.subscription.common.exception.GlobalExceptionHandler;
 import com.artinus.subscription.subscription.application.port.in.ChangeSubscriptionUseCase;
 import com.artinus.subscription.subscription.application.port.in.GetSubscriptionHistoryQuery;
-import com.artinus.subscription.subscription.domain.SubscriptionStatus;
+import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

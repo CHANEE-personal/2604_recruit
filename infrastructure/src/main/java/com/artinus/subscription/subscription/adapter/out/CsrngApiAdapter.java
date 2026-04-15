@@ -1,7 +1,7 @@
 package com.artinus.subscription.subscription.adapter.out;
 
 import com.artinus.subscription.common.exception.BusinessException;
-import com.artinus.subscription.common.exception.ErrorCode;
+import com.artinus.subscription.common.exception.enums.ErrorCode;
 import com.artinus.subscription.subscription.application.port.out.GetRandomResultPort;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;

@@ -1,5 +1,6 @@
 package com.artinus.subscription.subscription.domain;
 
+import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
 import lombok.Builder;
 import lombok.Getter;
 

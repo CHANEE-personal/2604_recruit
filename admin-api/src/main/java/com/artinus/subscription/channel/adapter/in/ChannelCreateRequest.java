@@ -1,7 +1,7 @@
 package com.artinus.subscription.channel.adapter.in;
 
 import com.artinus.subscription.channel.application.port.in.CreateChannelCommand;
-import com.artinus.subscription.channel.domain.ChannelType;
+import com.artinus.subscription.channel.domain.enums.ChannelType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

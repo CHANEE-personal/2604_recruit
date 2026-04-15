@@ -1,12 +1,12 @@
 package com.artinus.subscription.member.adapter.out;
 
 import com.artinus.subscription.common.exception.BusinessException;
-import com.artinus.subscription.common.exception.ErrorCode;
+import com.artinus.subscription.common.exception.enums.ErrorCode;
 import com.artinus.subscription.member.application.port.out.LoadAllMembersPort;
 import com.artinus.subscription.member.application.port.out.LoadMemberPort;
 import com.artinus.subscription.member.application.port.out.SaveMemberPort;
 import com.artinus.subscription.member.domain.Member;
-import com.artinus.subscription.subscription.domain.SubscriptionStatus;
+import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

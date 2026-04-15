@@ -1,8 +1,8 @@
 package com.artinus.subscription.channel.application.port.in;
 
-import com.artinus.subscription.channel.domain.ChannelType;
+import com.artinus.subscription.channel.domain.enums.ChannelType;
 import com.artinus.subscription.common.exception.BusinessException;
-import com.artinus.subscription.common.exception.ErrorCode;
+import com.artinus.subscription.common.exception.enums.ErrorCode;
 import lombok.Builder;
 import lombok.Getter;
 

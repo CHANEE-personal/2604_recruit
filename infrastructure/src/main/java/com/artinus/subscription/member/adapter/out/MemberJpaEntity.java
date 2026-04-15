@@ -5,12 +5,12 @@ import lombok.*;
 
 import jakarta.persistence.*;
 
-@Entity
-@Table(name = "member")
 @Getter
+@Entity
+@Builder
+@Table(name = "member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
 class MemberJpaEntity {
 
     @Id

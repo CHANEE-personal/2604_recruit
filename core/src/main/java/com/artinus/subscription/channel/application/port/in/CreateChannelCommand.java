@@ -15,10 +15,10 @@ public class CreateChannelCommand {
 
 
     public void validate() {
-        if (name == null || name.isBlank()) {
+        if(name == null || name.isBlank()) {
             throw new BusinessException(ErrorCode.INVALID_CHANNEL_NAME);
         }
-        if (channelType == null) {
+        if(channelType == null) {
             throw new BusinessException(ErrorCode.INVALID_CHANNEL_TYPE);
         }
     }

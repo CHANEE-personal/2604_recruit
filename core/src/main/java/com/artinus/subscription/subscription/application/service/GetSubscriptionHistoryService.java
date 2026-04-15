@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -21,8 +20,8 @@ class GetSubscriptionHistoryService implements GetSubscriptionHistoryQuery {
     private final SummarizeHistoryPort summarizeHistoryPort;
 
 
-    @Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public HistoryResponse getHistory(String phoneNumber) {
         List<SubscriptionHistory> histories =
                 loadSubscriptionHistoryPort.findByPhoneNumber(phoneNumber);
@@ -35,7 +34,7 @@ class GetSubscriptionHistoryService implements GetSubscriptionHistoryQuery {
                         .previousStatus(h.getPreviousStatus())
                         .subscriptionStatus(h.getNewStatus())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
 
         return HistoryResponse.builder()
                 .history(historyItems)

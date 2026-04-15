@@ -18,7 +18,8 @@ class GetChannelService implements GetChannelQuery {
     @Override
     @Transactional(readOnly = true)
     public List<ChannelResponse> getChannels() {
-        return loadAllChannelsPort.findAll().stream()
+        return loadAllChannelsPort.findAll()
+                .stream()
                 .map(ChannelResponse::from)
                 .toList();
     }

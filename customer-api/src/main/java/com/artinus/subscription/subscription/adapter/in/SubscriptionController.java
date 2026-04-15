@@ -14,7 +14,7 @@ import jakarta.validation.constraints.NotBlank;
 @RequestMapping("/api/v1/subscriptions")
 @RequiredArgsConstructor
 @Validated
-public class SubscriptionController {
+class SubscriptionController {
 
     private final ChangeSubscriptionUseCase changeSubscriptionUseCase;
     private final GetSubscriptionHistoryQuery getSubscriptionHistoryQuery;

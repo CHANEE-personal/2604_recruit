@@ -5,9 +5,9 @@ import com.artinus.subscription.subscription.application.port.out.SaveSubscripti
 import com.artinus.subscription.subscription.domain.SubscriptionHistory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -18,6 +18,7 @@ class SubscriptionHistoryPersistenceAdapter
     private final SubscriptionHistoryMapper subscriptionHistoryMapper;
 
 
+    @Transactional
     public SubscriptionHistory save(SubscriptionHistory history) {
         SubscriptionHistoryJpaEntity entity = subscriptionHistoryMapper.toEntity(history);
         return subscriptionHistoryMapper.toDomain(subscriptionHistoryJpaRepository.save(entity));
@@ -28,6 +29,6 @@ class SubscriptionHistoryPersistenceAdapter
         return subscriptionHistoryJpaRepository.findByPhoneNumberOrderByCreatedAtDesc(phoneNumber)
                 .stream()
                 .map(subscriptionHistoryMapper::toDomain)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

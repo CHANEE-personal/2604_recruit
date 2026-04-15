@@ -35,8 +35,8 @@ class ChangeSubscriptionService implements ChangeSubscriptionUseCase {
 
 
     @DistributedLock(key = "#command.phoneNumber")
-    @Transactional
     @Override
+    @Transactional
     public void changeSubscription(ChangeSubscriptionCommand command) {
         command.validate();
 

@@ -19,9 +19,9 @@ class CsrngApiAdapter implements GetRandomResultPort {
     private final CsrngFeignClient csrngFeignClient;
 
 
+    @Override
     @CircuitBreaker(name = "csrng", fallbackMethod = "fallbackGetRandom")
     @Retry(name = "csrng", fallbackMethod = "fallbackGetRandom")
-    @Override
     public boolean getRandomResult() {
         try {
             List<CsrngResponse> responses = csrngFeignClient.getRandom();

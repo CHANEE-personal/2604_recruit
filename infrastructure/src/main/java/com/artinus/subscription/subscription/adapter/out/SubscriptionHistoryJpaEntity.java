@@ -7,12 +7,12 @@ import org.hibernate.annotations.CreationTimestamp;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "subscription_history")
 @Getter
+@Entity
+@Builder
+@Table(name = "subscription_history")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
 class SubscriptionHistoryJpaEntity {
 
     @Id

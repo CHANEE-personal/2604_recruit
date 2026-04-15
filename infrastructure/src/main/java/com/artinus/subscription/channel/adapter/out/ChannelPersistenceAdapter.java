@@ -31,7 +31,8 @@ class ChannelPersistenceAdapter implements LoadChannelPort, SaveChannelPort, Loa
 
 
     public List<Channel> findAll() {
-        return channelJpaRepository.findAll().stream()
+        return channelJpaRepository.findAll()
+                .stream()
                 .map(channelMapper::toDomain)
                 .toList();
     }

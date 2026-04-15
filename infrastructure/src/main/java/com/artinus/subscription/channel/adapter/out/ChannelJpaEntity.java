@@ -5,12 +5,12 @@ import lombok.*;
 
 import jakarta.persistence.*;
 
-@Entity
-@Table(name = "channel")
 @Getter
+@Entity
+@Builder
+@Table(name = "channel")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
 class ChannelJpaEntity {
 
     @Id

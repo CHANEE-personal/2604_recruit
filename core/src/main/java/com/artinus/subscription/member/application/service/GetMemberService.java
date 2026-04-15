@@ -18,7 +18,8 @@ class GetMemberService implements GetMemberQuery {
     @Override
     @Transactional(readOnly = true)
     public List<MemberResponse> getMembers() {
-        return loadAllMembersPort.findAll().stream()
+        return loadAllMembersPort.findAll()
+                .stream()
                 .map(MemberResponse::from)
                 .toList();
     }

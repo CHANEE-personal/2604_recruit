@@ -49,7 +49,8 @@ public class DistributedLockAspect {
             }
             return joinPoint.proceed();
         } catch(InterruptedException e) {
-            Thread.currentThread().interrupt();
+            Thread.currentThread()
+                    .interrupt();
             throw new BusinessException(ErrorCode.SUBSCRIPTION_LOCK_CONFLICT);
         } finally {
             if(acquired && lock.isHeldByCurrentThread()) {
@@ -69,6 +70,7 @@ public class DistributedLockAspect {
             context.setVariable(paramNames[i], args[i]);
         }
 
-        return parser.parseExpression(keyExpression).getValue(context, String.class);
+        return parser.parseExpression(keyExpression)
+                .getValue(context, String.class);
     }
 }

@@ -13,11 +13,6 @@ public class Member {
     private SubscriptionStatus subscriptionStatus;
 
 
-    public void updateStatus(SubscriptionStatus newStatus) {
-        this.subscriptionStatus = newStatus;
-    }
-
-
     public static Member create(String phoneNumber) {
         return Member.builder()
                 .phoneNumber(phoneNumber)

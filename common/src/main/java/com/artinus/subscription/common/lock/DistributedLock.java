@@ -16,12 +16,18 @@ import java.lang.annotation.Target;
 @Documented
 public @interface DistributedLock {
 
-    /** 락 키를 결정하는 SpEL 표현식 */
+    /**
+     * 락 키를 결정하는 SpEL 표현식
+     */
     String key();
 
-    /** 락 획득 대기 시간 (초) */
+    /**
+     * 락 획득 대기 시간 (초)
+     */
     long waitTime() default 5;
 
-    /** 락 자동 해제 시간 (초, 데드락 방지) */
+    /**
+     * 락 자동 해제 시간 (초, 데드락 방지)
+     */
     long leaseTime() default 3;
 }

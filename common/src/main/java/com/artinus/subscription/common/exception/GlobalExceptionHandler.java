@@ -1,19 +1,21 @@
 package com.artinus.subscription.common.exception;
 
-import com.artinus.subscription.common.exception.enums.ErrorCode;
-import com.artinus.subscription.common.response.ApiResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.stream.Collectors;
+
 import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.context.i18n.LocaleContextHolder;
 
-import java.util.stream.Collectors;
+import com.artinus.subscription.common.exception.enums.ErrorCode;
+import com.artinus.subscription.common.response.ApiResponse;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -51,9 +53,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ApiResponse<Void>> handleMissingParam(
             MissingServletRequestParameterException e) {
+        String message = messageSource.getMessage("error.missing_parameter",
+                new Object[] {e.getParameterName()}, LocaleContextHolder.getLocale());
         log.warn("Missing request parameter: {}", e.getParameterName());
         return ResponseEntity.badRequest()
-                .body(ApiResponse.fail(e.getParameterName() + " 파라미터는 필수입니다."));
+                .body(ApiResponse.fail(message));
     }
 
 

@@ -1,5 +1,22 @@
 package com.artinus.subscription.subscription.application.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
+
 import com.artinus.subscription.channel.application.port.out.LoadChannelPort;
 import com.artinus.subscription.channel.domain.Channel;
 import com.artinus.subscription.channel.domain.enums.ChannelType;
@@ -12,22 +29,6 @@ import com.artinus.subscription.subscription.application.port.in.ChangeSubscript
 import com.artinus.subscription.subscription.application.port.out.GetRandomResultPort;
 import com.artinus.subscription.subscription.domain.SubscriptionHistoryEvent;
 import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
-
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ChangeSubscriptionServiceTest {

@@ -1,8 +1,8 @@
 package com.artinus.subscription.member.application.port.out;
 
-import com.artinus.subscription.member.domain.Member;
-
 import java.util.Optional;
+
+import com.artinus.subscription.member.domain.Member;
 
 public interface LoadMemberPort {
 

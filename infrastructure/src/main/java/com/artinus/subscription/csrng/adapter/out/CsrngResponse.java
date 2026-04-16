@@ -13,6 +13,11 @@ class CsrngResponse {
     private int random;
 
 
+    public boolean isSuccess() {
+        return "success".equals(status);
+    }
+
+
     public boolean isRandomOne() {
         return random == 1;
     }

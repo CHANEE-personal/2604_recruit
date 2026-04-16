@@ -7,9 +7,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 분산 락을 적용할 메서드에 선언하는 어노테이션.
- * key는 SpEL 표현식으로 락 키를 지정한다. (예: "#command.phoneNumber")
- * 락은 트랜잭션보다 먼저 획득되고 나중에 해제된다.
+ * 분산 락을 적용할 메서드에 선언하는 어노테이션. key는 SpEL 표현식으로 락 키를 지정한다. (예: "#command.phoneNumber") 락은 트랜잭션보다 먼저
+ * 획득되고 나중에 해제된다.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -27,7 +26,7 @@ public @interface DistributedLock {
     long waitTime() default 5;
 
     /**
-     * 락 자동 해제 시간 (초, 데드락 방지)
+     * 락 자동 해제 시간 (초, 데드락 방지) waitTime + 외부 API 최대 응답 시간(csrng: retry 3회 × 6s = ~20s)보다 크게 설정
      */
-    long leaseTime() default 3;
+    long leaseTime() default 30;
 }

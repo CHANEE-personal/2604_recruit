@@ -1,21 +1,23 @@
 package com.artinus.subscription.member.adapter.out;
 
-import com.artinus.subscription.common.exception.BusinessException;
-import com.artinus.subscription.common.exception.enums.ErrorCode;
-import com.artinus.subscription.member.application.port.out.LoadAllMembersPort;
-import com.artinus.subscription.member.application.port.out.LoadMemberPort;
-import com.artinus.subscription.member.application.port.out.SaveMemberPort;
-import com.artinus.subscription.member.domain.Member;
-import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Component;
+
+import com.artinus.subscription.member.application.port.out.LoadAllMembersPort;
+import com.artinus.subscription.member.application.port.out.LoadMemberPort;
+import com.artinus.subscription.member.application.port.out.SaveMemberPort;
+import com.artinus.subscription.member.application.port.out.UpdateMemberStatusPort;
+import com.artinus.subscription.member.domain.Member;
+import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
+
+import lombok.RequiredArgsConstructor;
+
 @Component
 @RequiredArgsConstructor
-class MemberPersistenceAdapter implements LoadMemberPort, SaveMemberPort, LoadAllMembersPort {
+class MemberPersistenceAdapter
+        implements LoadMemberPort, SaveMemberPort, UpdateMemberStatusPort, LoadAllMembersPort {
 
     private final MemberJpaRepository memberJpaRepository;
     private final MemberMapper memberMapper;
@@ -33,11 +35,8 @@ class MemberPersistenceAdapter implements LoadMemberPort, SaveMemberPort, LoadAl
     }
 
 
-    public Member updateStatus(String phoneNumber, SubscriptionStatus newStatus) {
-        MemberJpaEntity entity = memberJpaRepository.findByPhoneNumber(phoneNumber)
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-        entity.updateStatus(newStatus);
-        return memberMapper.toDomain(memberJpaRepository.save(entity));
+    public void updateStatus(String phoneNumber, SubscriptionStatus newStatus) {
+        memberJpaRepository.updateSubscriptionStatus(phoneNumber, newStatus);
     }
 
 

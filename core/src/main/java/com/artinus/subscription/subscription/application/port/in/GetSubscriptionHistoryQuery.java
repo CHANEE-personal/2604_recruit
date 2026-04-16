@@ -1,11 +1,12 @@
 package com.artinus.subscription.subscription.application.port.in;
 
-import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
-import lombok.Builder;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
+
+import lombok.Builder;
+import lombok.Getter;
 
 public interface GetSubscriptionHistoryQuery {
 

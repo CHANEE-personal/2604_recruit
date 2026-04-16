@@ -1,13 +1,14 @@
 package com.artinus.subscription.subscription.adapter.in;
 
-import com.artinus.subscription.subscription.application.port.in.ChangeSubscriptionCommand;
-import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+
+import com.artinus.subscription.subscription.application.port.in.ChangeSubscriptionCommand;
+import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor

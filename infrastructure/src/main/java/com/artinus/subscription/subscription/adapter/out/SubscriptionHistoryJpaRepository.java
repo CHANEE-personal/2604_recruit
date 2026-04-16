@@ -1,8 +1,8 @@
 package com.artinus.subscription.subscription.adapter.out;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
 
 interface SubscriptionHistoryJpaRepository
         extends JpaRepository<SubscriptionHistoryJpaEntity, Long> {

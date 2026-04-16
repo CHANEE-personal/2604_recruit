@@ -2,11 +2,11 @@
 
 ## 계층 구분
 
-| 계층 | 위치 | 설명 |
-|---|---|---|
+| 계층         | 위치            | 설명            |
+|------------|---------------|---------------|
 | Controller | `controller/` | HTTP 요청/응답 처리 |
-| Service | `service/` | 비즈니스 로직 |
-| Repository | `repository/` | 데이터 접근 |
+| Service    | `service/`    | 비즈니스 로직       |
+| Repository | `repository/` | 데이터 접근        |
 
 ## 검토 기준
 

@@ -1,14 +1,16 @@
 package com.artinus.subscription.subscription.adapter.in;
 
-import com.artinus.subscription.common.response.ApiResponse;
-import com.artinus.subscription.subscription.application.port.in.ChangeSubscriptionUseCase;
-import com.artinus.subscription.subscription.application.port.in.GetSubscriptionHistoryQuery;
-import lombok.RequiredArgsConstructor;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import com.artinus.subscription.common.response.ApiResponse;
+import com.artinus.subscription.subscription.application.port.in.ChangeSubscriptionUseCase;
+import com.artinus.subscription.subscription.application.port.in.GetSubscriptionHistoryQuery;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/subscriptions")

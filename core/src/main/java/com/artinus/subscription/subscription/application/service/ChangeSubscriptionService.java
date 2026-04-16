@@ -1,5 +1,11 @@
 package com.artinus.subscription.subscription.application.service;
 
+import java.util.Optional;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.artinus.subscription.channel.application.port.out.LoadChannelPort;
 import com.artinus.subscription.channel.domain.Channel;
 import com.artinus.subscription.common.exception.BusinessException;
@@ -7,6 +13,7 @@ import com.artinus.subscription.common.exception.enums.ErrorCode;
 import com.artinus.subscription.common.lock.DistributedLock;
 import com.artinus.subscription.member.application.port.out.LoadMemberPort;
 import com.artinus.subscription.member.application.port.out.SaveMemberPort;
+import com.artinus.subscription.member.application.port.out.UpdateMemberStatusPort;
 import com.artinus.subscription.member.domain.Member;
 import com.artinus.subscription.subscription.application.port.in.ChangeSubscriptionCommand;
 import com.artinus.subscription.subscription.application.port.in.ChangeSubscriptionUseCase;
@@ -14,13 +21,9 @@ import com.artinus.subscription.subscription.application.port.out.GetRandomResul
 import com.artinus.subscription.subscription.domain.SubscriptionHistory;
 import com.artinus.subscription.subscription.domain.SubscriptionHistoryEvent;
 import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -29,6 +32,7 @@ class ChangeSubscriptionService implements ChangeSubscriptionUseCase {
 
     private final LoadMemberPort loadMemberPort;
     private final SaveMemberPort saveMemberPort;
+    private final UpdateMemberStatusPort updateMemberStatusPort;
     private final LoadChannelPort loadChannelPort;
     private final GetRandomResultPort getRandomResultPort;
     private final ApplicationEventPublisher eventPublisher;
@@ -61,7 +65,7 @@ class ChangeSubscriptionService implements ChangeSubscriptionUseCase {
             throw new BusinessException(ErrorCode.SUBSCRIPTION_RANDOM_ROLLBACK);
         }
 
-        saveMemberPort.updateStatus(command.getPhoneNumber(), targetStatus);
+        updateMemberStatusPort.updateStatus(command.getPhoneNumber(), targetStatus);
 
         eventPublisher.publishEvent(new SubscriptionHistoryEvent(SubscriptionHistory.builder()
                 .memberId(member.getId())

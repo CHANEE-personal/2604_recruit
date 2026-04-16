@@ -47,10 +47,12 @@ management:
 
 csrng:
   base-url: https://csrng.net
+  fallback-result: true  # true=commit(구독 처리), false=rollback(구독 취소)
 
 openai:
   api-key: ${OPENAI_API_KEY}
   base-url: https://api.openai.com
+  model: gpt-3.5-turbo
 
 resilience4j:
   circuitbreaker:

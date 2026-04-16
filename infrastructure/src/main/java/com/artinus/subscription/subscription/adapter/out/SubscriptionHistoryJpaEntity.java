@@ -1,11 +1,14 @@
 package com.artinus.subscription.subscription.adapter.out;
 
-import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
+
+import lombok.*;
 
 @Getter
 @Entity

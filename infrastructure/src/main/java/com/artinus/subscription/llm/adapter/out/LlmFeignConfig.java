@@ -1,12 +1,13 @@
 package com.artinus.subscription.llm.adapter.out;
 
-import feign.RequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
+import feign.RequestInterceptor;
+
 class LlmFeignConfig {
 
-    @Value("${openai.api-key}")
+    @Value("${openai.api-key:}")
     private String apiKey;
 
 

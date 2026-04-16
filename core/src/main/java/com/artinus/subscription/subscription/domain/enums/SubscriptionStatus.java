@@ -1,7 +1,6 @@
 package com.artinus.subscription.subscription.domain.enums;
 
 public enum SubscriptionStatus {
-
     NONE, BASIC, PREMIUM;
 
 

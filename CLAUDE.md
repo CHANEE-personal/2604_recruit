@@ -11,6 +11,6 @@ Spring Boot 3.3.5 + Java 17 기반 헥사고날 아키텍처 구독 서비스.
 | 런타임 디버깅/검토      | `runtime-guide.md`                                                           |
 | MapStruct 매핑 검토 | `mapping-guide.md`                                                           |
 | MVC 구조 리뷰       | `review-guide.md` + `review-mvc.md`                                          |
-| 테스트 코드 작성/리뷰   | `test-guide.md`                                                              |
+| 테스트 코드 작성/리뷰    | `test-guide.md`                                                              |
 
 > 태스크에 해당하지 않는 파일은 로드하지 않는다.

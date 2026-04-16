@@ -1,7 +1,6 @@
 package com.artinus.subscription.channel.domain.enums;
 
 public enum ChannelType {
-
     BOTH, SUBSCRIBE_ONLY, UNSUBSCRIBE_ONLY;
 
 

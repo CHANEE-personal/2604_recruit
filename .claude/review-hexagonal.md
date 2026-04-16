@@ -4,10 +4,10 @@
 
 ## 접근 제어자 규칙
 
-| `public`                        | `default` (package-private)                                                                   |
-|---------------------------------|-----------------------------------------------------------------------------------------------|
-| Controller                      | JpaEntity, JpaRepository, Mapper, **PersistenceAdapter**, **ApiAdapter**, Service             |
-| Port In/Out 인터페이스, Command, Domain | FeignClient, FeignConfig, Request/Response DTO, SubscriptionRequest                           |
+| `public`                           | `default` (package-private)                                                       |
+|------------------------------------|-----------------------------------------------------------------------------------|
+| Controller                         | JpaEntity, JpaRepository, Mapper, **PersistenceAdapter**, **ApiAdapter**, Service |
+| Port In/Out 인터페이스, Command, Domain | FeignClient, FeignConfig, Request/Response DTO, SubscriptionRequest               |
 
 > PersistenceAdapter / ApiAdapter 는 Port Out 인터페이스로만 접근하므로 `default` 가 올바르다.
 > `public` 으로 열면 인터페이스를 우회한 구현체 직접 참조가 가능해져 헥사고날 원칙 위반.

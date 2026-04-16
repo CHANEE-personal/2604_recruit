@@ -1,9 +1,10 @@
 package com.artinus.subscription.member.adapter.out;
 
-import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
-import lombok.*;
-
 import jakarta.persistence.*;
+
+import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
+
+import lombok.*;
 
 @Getter
 @Entity

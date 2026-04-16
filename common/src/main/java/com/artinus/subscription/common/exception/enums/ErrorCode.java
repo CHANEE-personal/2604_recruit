@@ -1,12 +1,16 @@
 package com.artinus.subscription.common.exception.enums;
 
+import org.springframework.http.HttpStatus;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
+
+    // Common validation
+    REQUIRED_FIELD_MISSING(HttpStatus.BAD_REQUEST, "error.required_field_missing"),
 
     // Member
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "error.member.not_found"),

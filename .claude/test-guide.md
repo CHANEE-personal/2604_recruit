@@ -2,11 +2,11 @@
 
 ## 테스트 종류 및 어노테이션
 
-| 종류 | 어노테이션 | 대상 | DB |
-|---|---|---|---|
-| 단위 테스트 | `@ExtendWith(MockitoExtension.class)` | Service | 불필요 |
-| 슬라이스 테스트 | `@WebMvcTest` | Controller | 불필요 |
-| 통합 테스트 | `@SpringBootTest` | 전체 흐름 | H2 (test 프로파일) |
+| 종류       | 어노테이션                                 | 대상         | DB             |
+|----------|---------------------------------------|------------|----------------|
+| 단위 테스트   | `@ExtendWith(MockitoExtension.class)` | Service    | 불필요            |
+| 슬라이스 테스트 | `@WebMvcTest`                         | Controller | 불필요            |
+| 통합 테스트   | `@SpringBootTest`                     | 전체 흐름      | H2 (test 프로파일) |
 
 ## 단위 테스트 원칙 (Service)
 
@@ -56,12 +56,12 @@ class SubscriptionControllerTest {
 
 ## 테스트 작성 기준
 
-| 작성 O | 작성 X |
-|---|---|
-| 비즈니스 로직 분기 (성공/실패/예외) | JpaEntity, JpaRepository (인프라) |
-| Command `validate()` 검증 | DTO 단순 getter/setter |
-| 예외 타입 + ErrorCode 검증 | 외부 라이브러리 동작 |
-| HTTP 상태코드 + 응답 구조 | 이미 프레임워크가 보장하는 동작 |
+| 작성 O                    | 작성 X                           |
+|-------------------------|--------------------------------|
+| 비즈니스 로직 분기 (성공/실패/예외)   | JpaEntity, JpaRepository (인프라) |
+| Command `validate()` 검증 | DTO 단순 getter/setter           |
+| 예외 타입 + ErrorCode 검증    | 외부 라이브러리 동작                    |
+| HTTP 상태코드 + 응답 구조       | 이미 프레임워크가 보장하는 동작              |
 
 ## 예외 검증 패턴
 

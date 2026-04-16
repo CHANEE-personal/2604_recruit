@@ -1,10 +1,11 @@
 package com.artinus.subscription.subscription.domain;
 
+import java.time.LocalDateTime;
+
 import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
+
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Builder

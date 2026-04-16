@@ -1,0 +1,29 @@
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  flyway:
+    enabled: false
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+
+csrng:
+  base-url: https://csrng.net
+
+openai:
+  api-key: test-key
+  base-url: https://api.openai.com

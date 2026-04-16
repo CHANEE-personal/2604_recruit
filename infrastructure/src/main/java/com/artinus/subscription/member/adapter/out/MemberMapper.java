@@ -1,10 +1,11 @@
 package com.artinus.subscription.member.adapter.out;
 
-import com.artinus.subscription.member.domain.Member;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.ReportingPolicy;
+
+import com.artinus.subscription.member.domain.Member;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, unmappedTargetPolicy = ReportingPolicy.ERROR)
 interface MemberMapper {

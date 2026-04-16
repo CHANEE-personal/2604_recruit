@@ -1,16 +1,16 @@
 package com.artinus.subscription.channel.application.port.in;
 
+import java.util.List;
+
 import com.artinus.subscription.channel.domain.Channel;
 import com.artinus.subscription.channel.domain.enums.ChannelType;
+
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 public interface GetChannelQuery {
 
     List<ChannelResponse> getChannels();
-
 
     @Getter
     @Builder

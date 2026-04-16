@@ -59,7 +59,7 @@
 - `random` 값에 따른 처리
 
   | random 값 | 처리 |
-      |---|---|
+          |---|---|
   | `1` | 정상 처리 — 트랜잭션 커밋 |
   | `0` | 예외 발생 — 트랜잭션 롤백 |
 
@@ -76,7 +76,7 @@
 - 구독 상태 변경 규칙
 
   | 현재 상태  | 변경 가능 상태              |
-      |--------|-----------------------|
+          |--------|-----------------------|
   | 구독 안함  | 일반 구독, 프리미엄 구독        |
   | 일반 구독  | 프리미엄 구독               |
   | 프리미엄 구독 | _(변경 불가)_             |
@@ -89,7 +89,7 @@
 - 해지 상태 변경 규칙
 
   | 현재 상태 | 변경 가능 상태 |
-      |---|---|
+          |---|---|
   | 프리미엄 구독 | 일반 구독, 구독 안함 |
   | 일반 구독 | 구독 안함 |
   | 구독 안함 | _(변경 불가)_ |
@@ -211,12 +211,12 @@ graph LR
         subgraph VPC ["VPC"]
             ALB(["ALB"])
 
-            subgraph ECS_C ["ECS — customer-api  :8080"]
+            subgraph ECS_C ["ECS — customer-api :8080"]
                 BLUE_C(["Blue Task"])
                 GREEN_C(["Green Task"])
             end
 
-            subgraph ECS_A ["ECS — admin-api  :8081"]
+            subgraph ECS_A ["ECS — admin-api :8081"]
                 BLUE_A(["Blue Task"])
                 GREEN_A(["Green Task"])
             end
@@ -228,7 +228,6 @@ graph LR
     CSRNG(["csrng\nExternal API"])
     LLM(["LLM API"])
     SLACK(["Slack"])
-
     DEV -->|" workflow_dispatch "| REPO
     GA_C -->|" Push :customer-api "| ECR
     GA_A -->|" Push :admin-api "| ECR
@@ -278,7 +277,7 @@ graph LR
         T_A(["deploy-admin-api.yml"])
     end
 
-    subgraph REUSABLE ["_deploy-module.yml  Reusable Workflow"]
+    subgraph REUSABLE ["_deploy-module.yml Reusable Workflow"]
         direction TB
         S1["① Gradle Build\n:module:build -x test"]
         S2["② Docker Build & Push\nECR :module 태그"]

@@ -1,6 +1,7 @@
 package com.artinus.subscription.channel.domain;
 
 import com.artinus.subscription.channel.domain.enums.ChannelType;
+
 import lombok.Builder;
 import lombok.Getter;
 

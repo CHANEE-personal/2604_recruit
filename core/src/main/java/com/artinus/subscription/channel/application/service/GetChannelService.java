@@ -1,12 +1,14 @@
 package com.artinus.subscription.channel.application.service;
 
-import com.artinus.subscription.channel.application.port.in.GetChannelQuery;
-import com.artinus.subscription.channel.application.port.out.LoadAllChannelsPort;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import com.artinus.subscription.channel.application.port.in.GetChannelQuery;
+import com.artinus.subscription.channel.application.port.out.LoadAllChannelsPort;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

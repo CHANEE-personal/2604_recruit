@@ -1,6 +1,7 @@
 package com.artinus.subscription.common.exception;
 
 import com.artinus.subscription.common.exception.enums.ErrorCode;
+
 import lombok.Getter;
 
 @Getter

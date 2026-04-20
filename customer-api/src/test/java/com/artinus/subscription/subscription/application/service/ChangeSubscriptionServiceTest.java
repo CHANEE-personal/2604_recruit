@@ -24,6 +24,7 @@ import com.artinus.subscription.common.exception.BusinessException;
 import com.artinus.subscription.common.exception.enums.ErrorCode;
 import com.artinus.subscription.member.application.port.out.LoadMemberPort;
 import com.artinus.subscription.member.application.port.out.SaveMemberPort;
+import com.artinus.subscription.member.application.port.out.UpdateMemberStatusPort;
 import com.artinus.subscription.member.domain.Member;
 import com.artinus.subscription.subscription.application.port.in.ChangeSubscriptionCommand;
 import com.artinus.subscription.subscription.application.port.out.GetRandomResultPort;
@@ -40,6 +41,8 @@ class ChangeSubscriptionServiceTest {
     private LoadMemberPort loadMemberPort;
     @Mock
     private SaveMemberPort saveMemberPort;
+    @Mock
+    private UpdateMemberStatusPort updateMemberStatusPort;
     @Mock
     private LoadChannelPort loadChannelPort;
     @Mock
@@ -107,7 +110,7 @@ class ChangeSubscriptionServiceTest {
 
         service.changeSubscription(command);
 
-        verify(saveMemberPort).updateStatus("01012345678", SubscriptionStatus.BASIC);
+        verify(updateMemberStatusPort).updateStatus("01012345678", SubscriptionStatus.BASIC);
         verify(eventPublisher).publishEvent(any(SubscriptionHistoryEvent.class));
     }
 
@@ -124,7 +127,7 @@ class ChangeSubscriptionServiceTest {
 
         service.changeSubscription(command);
 
-        verify(saveMemberPort).updateStatus("01012345678", SubscriptionStatus.PREMIUM);
+        verify(updateMemberStatusPort).updateStatus("01012345678", SubscriptionStatus.PREMIUM);
         verify(eventPublisher).publishEvent(any(SubscriptionHistoryEvent.class));
     }
 
@@ -141,7 +144,7 @@ class ChangeSubscriptionServiceTest {
 
         service.changeSubscription(command);
 
-        verify(saveMemberPort).updateStatus("01012345678", SubscriptionStatus.BASIC);
+        verify(updateMemberStatusPort).updateStatus("01012345678", SubscriptionStatus.BASIC);
         verify(eventPublisher).publishEvent(any(SubscriptionHistoryEvent.class));
     }
 
@@ -158,7 +161,7 @@ class ChangeSubscriptionServiceTest {
 
         service.changeSubscription(command);
 
-        verify(saveMemberPort).updateStatus("01012345678", SubscriptionStatus.NONE);
+        verify(updateMemberStatusPort).updateStatus("01012345678", SubscriptionStatus.NONE);
         verify(eventPublisher).publishEvent(any(SubscriptionHistoryEvent.class));
     }
 
@@ -177,7 +180,7 @@ class ChangeSubscriptionServiceTest {
         service.changeSubscription(command);
 
         verify(saveMemberPort).save(any());
-        verify(saveMemberPort).updateStatus("01099998888", SubscriptionStatus.BASIC);
+        verify(updateMemberStatusPort).updateStatus("01099998888", SubscriptionStatus.BASIC);
         verify(eventPublisher).publishEvent(any(SubscriptionHistoryEvent.class));
     }
 

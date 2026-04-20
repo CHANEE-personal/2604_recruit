@@ -32,6 +32,11 @@ class ChannelPersistenceAdapter implements LoadChannelPort, SaveChannelPort, Loa
     }
 
 
+    public boolean existsByName(String name) {
+        return channelJpaRepository.existsByName(name);
+    }
+
+
     public List<Channel> findAll() {
         return channelJpaRepository.findAll()
                 .stream()

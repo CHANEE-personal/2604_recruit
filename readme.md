@@ -59,7 +59,7 @@
 - `random` 값에 따른 처리
 
   | random 값 | 처리 |
-                |---|---|
+                  |---|---|
   | `1` | 정상 처리 — 트랜잭션 커밋 |
   | `0` | 예외 발생 — 트랜잭션 롤백 |
 
@@ -76,7 +76,7 @@
 - 구독 상태 변경 규칙
 
   | 현재 상태  | 변경 가능 상태              |
-                |--------|-----------------------|
+                  |--------|-----------------------|
   | 구독 안함  | 일반 구독, 프리미엄 구독        |
   | 일반 구독  | 프리미엄 구독               |
   | 프리미엄 구독 | _(변경 불가)_             |
@@ -89,7 +89,7 @@
 - 해지 상태 변경 규칙
 
   | 현재 상태 | 변경 가능 상태 |
-                |---|---|
+                  |---|---|
   | 프리미엄 구독 | 일반 구독, 구독 안함 |
   | 일반 구독 | 구독 안함 |
   | 구독 안함 | _(변경 불가)_ |
@@ -359,10 +359,10 @@ csrng, OpenAI 두 외부 API를 일관된 방식으로 호출합니다.
 
 외부 API(csrng, LLM)는 언제든 지연·장애가 발생할 수 있습니다. 단순 재시도만으로는 장애 중 요청이 계속 누적되는 문제가 있습니다.
 
-| 패턴                | 역할                                       |
-|-------------------|------------------------------------------|
+| 패턴                | 역할                                                       |
+|-------------------|----------------------------------------------------------|
 | `@Retry`          | 일시적 오류에 Exponential Backoff 재시도 (csrng 최대 3회, LLM 최대 2회) |
-| `@CircuitBreaker` | 연속 실패율 50% 초과 시 서킷 OPEN → 즉시 fallback 반환 |
+| `@CircuitBreaker` | 연속 실패율 50% 초과 시 서킷 OPEN → 즉시 fallback 반환                 |
 
 - try-catch 로 예외를 삼키면 Resilience4j가 실패로 인식하지 못하므로, **어댑터에서 예외를 직접 잡지 않고** 프레임워크가 감지하도록 설계
 - CircuitBreaker fallback 은 설정값(`csrng.fallback-result`)으로 외부화 — 운영 중 롤백 정책 변경 시 재배포 불필요
@@ -392,9 +392,11 @@ csrng, OpenAI 두 외부 API를 일관된 방식으로 호출합니다.
 
 ### `@Modifying @Query` JPQL 업데이트 (더블 쿼리 방지)
 
-기존 `updateStatus`가 `findByPhoneNumber` → `entity.setStatus()` → `save()` 패턴이었는데, 서비스 레이어에서 이미 회원을 조회했음에도 **어댑터에서 다시 SELECT** 가 발생했습니다.
+기존 `updateStatus`가 `findByPhoneNumber` → `entity.setStatus()` → `save()` 패턴이었는데, 서비스 레이어에서 이미 회원을 조회했음에도 **어댑터에서 다시
+SELECT** 가 발생했습니다.
 
 ```java
+
 @Modifying(clearAutomatically = true)
 @Query("UPDATE MemberJpaEntity m SET m.subscriptionStatus = :status WHERE m.phoneNumber = :phoneNumber")
 void updateSubscriptionStatus(String phoneNumber, SubscriptionStatus status);
@@ -410,7 +412,8 @@ void updateSubscriptionStatus(String phoneNumber, SubscriptionStatus status);
 
 모든 API 응답을 `ApiResponse<T>` 제네릭 래퍼로 통일합니다.
 
-- `@RestControllerAdvice`로 `BusinessException`, `MethodArgumentNotValidException`, `MissingServletRequestParameterException` 등을 일관된 형태로 변환
+- `@RestControllerAdvice`
+  로 `BusinessException`, `MethodArgumentNotValidException`, `MissingServletRequestParameterException` 등을 일관된 형태로 변환
 - `{success, message, data}` 구조로 클라이언트 파싱 일관성 확보
 - `ErrorCode` enum으로 에러 코드·HTTP 상태·메시지 키를 한 곳에서 관리 — 에러 추가 시 핸들러 수정 불필요
 

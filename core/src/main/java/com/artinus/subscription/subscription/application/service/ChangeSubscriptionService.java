@@ -61,7 +61,7 @@ class ChangeSubscriptionService implements ChangeSubscriptionUseCase {
 
         if(!getRandomResultPort.getRandomResult()) {
             log.info("csrng returned 0, rolling back subscription change for phoneNumber={}",
-                    command.getPhoneNumber());
+                    mask(command.getPhoneNumber()));
             throw new BusinessException(ErrorCode.SUBSCRIPTION_RANDOM_ROLLBACK);
         }
 
@@ -77,7 +77,15 @@ class ChangeSubscriptionService implements ChangeSubscriptionUseCase {
                 .build()));
 
         log.info("Subscription changed: phoneNumber={}, channel={}, {} -> {}",
-                command.getPhoneNumber(), channel.getName(), currentStatus, targetStatus);
+                mask(command.getPhoneNumber()), channel.getName(), currentStatus, targetStatus);
+    }
+
+
+    private String mask(String phoneNumber) {
+        if(phoneNumber == null) {
+            return "****";
+        }
+        return phoneNumber.replaceAll("(\\d{3})\\d{4}(\\d+)", "$1****$2");
     }
 
 

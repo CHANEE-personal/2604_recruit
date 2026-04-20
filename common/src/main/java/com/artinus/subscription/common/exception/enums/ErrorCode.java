@@ -22,6 +22,7 @@ public enum ErrorCode {
             "error.channel.unsubscribe_not_allowed"),
     INVALID_CHANNEL_NAME(HttpStatus.BAD_REQUEST, "error.channel.invalid_name"),
     INVALID_CHANNEL_TYPE(HttpStatus.BAD_REQUEST, "error.channel.invalid_type"),
+    DUPLICATE_CHANNEL_NAME(HttpStatus.CONFLICT, "error.channel.duplicate_name"),
 
     // Subscription
     INVALID_SUBSCRIPTION_TRANSITION(HttpStatus.BAD_REQUEST,

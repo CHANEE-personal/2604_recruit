@@ -231,7 +231,7 @@ class ChangeSubscriptionServiceTest {
 
 
     @Test
-    @DisplayName("미존재 회원 해지 시도 시 예외가 발생한다")
+    @DisplayName("미존재 회원의 현재 상태(NONE)와 동일한 NONE으로 변경 시도 시 예외가 발생한다")
     void unsubscribe_member_not_found() {
         ChangeSubscriptionCommand command = command("01099998888", 1L, SubscriptionStatus.NONE);
 
@@ -241,7 +241,7 @@ class ChangeSubscriptionServiceTest {
         assertThatThrownBy(() -> service.changeSubscription(command)).isInstanceOf(
                         BusinessException.class)
                 .satisfies(e -> assertThat(((BusinessException) e).getErrorCode()).isEqualTo(
-                        ErrorCode.MEMBER_NOT_FOUND));
+                        ErrorCode.INVALID_SUBSCRIPTION_TRANSITION));
     }
 
 

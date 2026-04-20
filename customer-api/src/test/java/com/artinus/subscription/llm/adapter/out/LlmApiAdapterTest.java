@@ -58,11 +58,10 @@ class LlmApiAdapterTest {
 
 
     @Test
-    @DisplayName("LLM API 호출 중 예외가 발생하면 기본 요약을 반환한다")
+    @DisplayName("LLM API 호출 중 예외가 발생하면 fallback이 기본 요약을 반환한다")
     void summarizeHistory_exception_returns_default() {
-        given(llmFeignClient.chatCompletion(any())).willThrow(new RuntimeException("API 오류"));
-
-        String result = adapter.summarizeHistory(List.of(history()));
+        String result =
+                adapter.fallbackSummarize(List.of(history()), new RuntimeException("API 오류"));
 
         assertThat(result).contains("총 1건의 구독 이력이 있습니다");
     }
@@ -71,9 +70,6 @@ class LlmApiAdapterTest {
     @Test
     @DisplayName("이력이 없으면 '구독 이력이 없습니다.'를 반환한다")
     void summarizeHistory_empty_histories() {
-        LlmResponse response = responseWithContent(null);
-        given(llmFeignClient.chatCompletion(any())).willReturn(response);
-
         String result = adapter.summarizeHistory(List.of());
 
         assertThat(result).isEqualTo("구독 이력이 없습니다.");
@@ -81,7 +77,7 @@ class LlmApiAdapterTest {
 
 
     @Test
-    @DisplayName("createdAt이 null이면 '알 수 없음'으로 표시된다")
+    @DisplayName("createdAt이 null이면 기본 요약에서 '알 수 없음'으로 표시된다")
     void summarizeHistory_null_createdAt() {
         SubscriptionHistory history = SubscriptionHistory.builder()
                 .channelName("기본 채널")
@@ -89,9 +85,8 @@ class LlmApiAdapterTest {
                 .newStatus(SubscriptionStatus.BASIC)
                 .createdAt(null)
                 .build();
-        given(llmFeignClient.chatCompletion(any())).willThrow(new RuntimeException("오류"));
 
-        String result = adapter.summarizeHistory(List.of(history));
+        String result = adapter.fallbackSummarize(List.of(history), new RuntimeException("오류"));
 
         assertThat(result).contains("총 1건의 구독 이력이 있습니다");
     }

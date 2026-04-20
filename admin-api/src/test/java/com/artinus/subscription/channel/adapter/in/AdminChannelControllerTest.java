@@ -22,7 +22,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.artinus.subscription.channel.application.port.in.CreateChannelUseCase;
 import com.artinus.subscription.channel.application.port.in.GetChannelQuery;
 import com.artinus.subscription.channel.application.port.in.GetChannelQuery.ChannelResponse;
-import com.artinus.subscription.channel.domain.Channel;
 import com.artinus.subscription.channel.domain.enums.ChannelType;
 import com.artinus.subscription.common.config.MessageConfig;
 import com.artinus.subscription.common.exception.GlobalExceptionHandler;
@@ -46,7 +45,7 @@ class AdminChannelControllerTest {
     @Test
     @DisplayName("채널 생성 요청 성공 시 201을 반환한다")
     void createChannel_success() throws Exception {
-        Channel channel = Channel.builder()
+        ChannelResponse channel = ChannelResponse.builder()
                 .id(1L)
                 .name("기본 채널")
                 .channelType(ChannelType.BOTH)

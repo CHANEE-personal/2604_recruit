@@ -70,7 +70,6 @@ class GetSubscriptionHistoryServiceTest {
     @DisplayName("이력이 없으면 빈 목록과 요약을 반환한다")
     void getHistory_empty() {
         given(loadSubscriptionHistoryPort.findByPhoneNumber("01099998888")).willReturn(List.of());
-        given(summarizeHistoryPort.summarizeHistory(List.of())).willReturn("구독 이력이 없습니다.");
 
         HistoryResponse response = service.getHistory("01099998888");
 

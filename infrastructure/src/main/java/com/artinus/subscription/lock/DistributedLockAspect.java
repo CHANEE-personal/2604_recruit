@@ -72,7 +72,8 @@ public class DistributedLockAspect {
             context.setVariable(paramNames[i], args[i]);
         }
 
-        return parser.parseExpression(keyExpression)
-                .getValue(context, String.class);
+        Object value = parser.parseExpression(keyExpression)
+                .getValue(context);
+        return value != null ? value.toString() : "";
     }
 }

@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.artinus.subscription.channel.application.port.in.CreateChannelCommand;
+import com.artinus.subscription.channel.application.port.in.GetChannelQuery.ChannelResponse;
+import com.artinus.subscription.channel.application.port.out.LoadChannelPort;
 import com.artinus.subscription.channel.application.port.out.SaveChannelPort;
 import com.artinus.subscription.channel.domain.Channel;
 import com.artinus.subscription.channel.domain.enums.ChannelType;
@@ -29,6 +31,9 @@ class CreateChannelServiceTest {
     @Mock
     private SaveChannelPort saveChannelPort;
 
+    @Mock
+    private LoadChannelPort loadChannelPort;
+
 
     @Test
     @DisplayName("유효한 커맨드로 채널을 생성한다")
@@ -42,9 +47,10 @@ class CreateChannelServiceTest {
                 .name("기본 채널")
                 .channelType(ChannelType.BOTH)
                 .build();
+        given(loadChannelPort.existsByName("기본 채널")).willReturn(false);
         given(saveChannelPort.save(any())).willReturn(saved);
 
-        Channel result = service.createChannel(command);
+        ChannelResponse result = service.createChannel(command);
 
         assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getName()).isEqualTo("기본 채널");

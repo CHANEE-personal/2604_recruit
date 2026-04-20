@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -150,7 +151,7 @@ class DistributedLockAspectTest {
         given(joinPoint.getSignature()).willReturn(methodSignature);
         given(methodSignature.getParameterNames()).willReturn(paramNames);
         given(joinPoint.getArgs()).willReturn(args);
-        given(redissonClient.getLock(any())).willReturn(rLock);
+        given(redissonClient.getLock(anyString())).willReturn(rLock);
     }
 
 

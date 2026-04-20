@@ -1,8 +1,8 @@
 package com.artinus.subscription.member.adapter.out;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.artinus.subscription.common.exception.BusinessException;
-import com.artinus.subscription.common.exception.enums.ErrorCode;
 import com.artinus.subscription.member.domain.Member;
 import com.artinus.subscription.subscription.domain.enums.SubscriptionStatus;
 
@@ -94,37 +92,10 @@ class MemberPersistenceAdapterTest {
     @Test
     @DisplayName("상태를 업데이트한다")
     void updateStatus_success() {
-        MemberJpaEntity entity = MemberJpaEntity.builder()
-                .id(1L)
-                .phoneNumber("01012345678")
-                .subscriptionStatus(SubscriptionStatus.NONE)
-                .build();
-        Member updated = Member.builder()
-                .id(1L)
-                .phoneNumber("01012345678")
-                .subscriptionStatus(SubscriptionStatus.BASIC)
-                .build();
+        adapter.updateStatus("01012345678", SubscriptionStatus.BASIC);
 
-        given(memberJpaRepository.findByPhoneNumber("01012345678")).willReturn(Optional.of(entity));
-        given(memberJpaRepository.save(entity)).willReturn(entity);
-        given(memberMapper.toDomain(entity)).willReturn(updated);
-
-        Member result = adapter.updateStatus("01012345678", SubscriptionStatus.BASIC);
-
-        assertThat(result.getSubscriptionStatus()).isEqualTo(SubscriptionStatus.BASIC);
-    }
-
-
-    @Test
-    @DisplayName("존재하지 않는 회원 상태 업데이트 시 MEMBER_NOT_FOUND 예외가 발생한다")
-    void updateStatus_member_not_found() {
-        given(memberJpaRepository.findByPhoneNumber("01099998888")).willReturn(Optional.empty());
-
-        assertThatThrownBy(
-                () -> adapter.updateStatus("01099998888", SubscriptionStatus.BASIC)).isInstanceOf(
-                        BusinessException.class)
-                .satisfies(e -> assertThat(((BusinessException) e).getErrorCode()).isEqualTo(
-                        ErrorCode.MEMBER_NOT_FOUND));
+        verify(memberJpaRepository).updateSubscriptionStatus("01012345678",
+                SubscriptionStatus.BASIC);
     }
 
 

@@ -23,23 +23,27 @@ class MemberPersistenceAdapter
     private final MemberMapper memberMapper;
 
 
+    @Override
     public Optional<Member> findByPhoneNumber(String phoneNumber) {
         return memberJpaRepository.findByPhoneNumber(phoneNumber)
                 .map(memberMapper::toDomain);
     }
 
 
+    @Override
     public Member save(Member member) {
         MemberJpaEntity entity = memberMapper.toEntity(member);
         return memberMapper.toDomain(memberJpaRepository.save(entity));
     }
 
 
+    @Override
     public void updateStatus(String phoneNumber, SubscriptionStatus newStatus) {
         memberJpaRepository.updateSubscriptionStatus(phoneNumber, newStatus);
     }
 
 
+    @Override
     public List<Member> findAll() {
         return memberJpaRepository.findAll()
                 .stream()

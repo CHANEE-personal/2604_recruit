@@ -180,7 +180,6 @@ class ChangeSubscriptionServiceTest {
         service.changeSubscription(command);
 
         verify(saveMemberPort).save(any());
-        verify(updateMemberStatusPort).updateStatus("01099998888", SubscriptionStatus.BASIC);
         verify(eventPublisher).publishEvent(any(SubscriptionHistoryEvent.class));
     }
 

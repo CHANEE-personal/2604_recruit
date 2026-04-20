@@ -1,7 +1,14 @@
 package com.artinus.subscription.subscription.domain.enums;
 
 public enum SubscriptionStatus {
-    NONE, BASIC, PREMIUM;
+    NONE(0), BASIC(1), PREMIUM(2);
+
+    private final int level;
+
+
+    SubscriptionStatus(int level) {
+        this.level = level;
+    }
 
 
     public boolean canSubscribeTo(SubscriptionStatus target) {
@@ -29,6 +36,6 @@ public enum SubscriptionStatus {
 
 
     public boolean isUpgradeTo(SubscriptionStatus target) {
-        return this.ordinal() < target.ordinal();
+        return this.level < target.level;
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.artinus.subscription.channel.application.port.in.CreateChannelCommand;
 import com.artinus.subscription.channel.application.port.in.CreateChannelUseCase;
+import com.artinus.subscription.channel.application.port.in.GetChannelQuery.ChannelResponse;
 import com.artinus.subscription.channel.application.port.out.LoadChannelPort;
 import com.artinus.subscription.channel.application.port.out.SaveChannelPort;
 import com.artinus.subscription.channel.domain.Channel;
@@ -23,7 +24,7 @@ class CreateChannelService implements CreateChannelUseCase {
 
     @Override
     @Transactional
-    public Channel createChannel(CreateChannelCommand command) {
+    public ChannelResponse createChannel(CreateChannelCommand command) {
         command.validate();
         if(loadChannelPort.existsByName(command.getName())) {
             throw new BusinessException(ErrorCode.DUPLICATE_CHANNEL_NAME, command.getName());
@@ -32,6 +33,6 @@ class CreateChannelService implements CreateChannelUseCase {
                 .name(command.getName())
                 .channelType(command.getChannelType())
                 .build();
-        return saveChannelPort.save(channel);
+        return ChannelResponse.from(saveChannelPort.save(channel));
     }
 }

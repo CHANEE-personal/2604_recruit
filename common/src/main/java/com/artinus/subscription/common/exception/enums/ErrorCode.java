@@ -27,8 +27,7 @@ public enum ErrorCode {
     // Subscription
     INVALID_SUBSCRIPTION_TRANSITION(HttpStatus.BAD_REQUEST,
             "error.subscription.invalid_transition"),
-    SUBSCRIPTION_RANDOM_ROLLBACK(HttpStatus.INTERNAL_SERVER_ERROR,
-            "error.subscription.random_rollback"),
+    SUBSCRIPTION_RANDOM_ROLLBACK(HttpStatus.CONFLICT, "error.subscription.random_rollback"),
     SUBSCRIPTION_LOCK_CONFLICT(HttpStatus.CONFLICT, "error.subscription.lock_conflict"),
 
     // External API

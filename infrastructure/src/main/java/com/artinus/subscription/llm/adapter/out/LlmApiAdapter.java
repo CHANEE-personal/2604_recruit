@@ -1,6 +1,7 @@
 package com.artinus.subscription.llm.adapter.out;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,10 +84,11 @@ class LlmApiAdapter implements SummarizeHistoryPort {
         if(histories.isEmpty()) {
             return "구독 이력이 없습니다.";
         }
+        SubscriptionHistory latest = histories.stream()
+                .filter(h -> h.getCreatedAt() != null)
+                .max(Comparator.comparing(SubscriptionHistory::getCreatedAt))
+                .orElse(histories.get(0));
         return String.format("총 %d건의 구독 이력이 있습니다. 최근 상태 변경: %s 채널에서 %s → %s", histories.size(),
-                histories.get(0)
-                        .getChannelName(), histories.get(0)
-                        .getPreviousStatus(), histories.get(0)
-                        .getNewStatus());
+                latest.getChannelName(), latest.getPreviousStatus(), latest.getNewStatus());
     }
 }

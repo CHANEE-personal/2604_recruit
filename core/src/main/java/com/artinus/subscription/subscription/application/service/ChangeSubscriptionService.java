@@ -11,6 +11,7 @@ import com.artinus.subscription.channel.domain.Channel;
 import com.artinus.subscription.common.exception.BusinessException;
 import com.artinus.subscription.common.exception.enums.ErrorCode;
 import com.artinus.subscription.common.lock.DistributedLock;
+import com.artinus.subscription.common.util.PhoneNumberUtils;
 import com.artinus.subscription.member.application.port.out.LoadMemberPort;
 import com.artinus.subscription.member.application.port.out.SaveMemberPort;
 import com.artinus.subscription.member.application.port.out.UpdateMemberStatusPort;
@@ -52,6 +53,12 @@ class ChangeSubscriptionService implements ChangeSubscriptionUseCase {
                 .orElse(SubscriptionStatus.NONE);
         SubscriptionStatus targetStatus = command.getTargetStatus();
 
+        if(currentStatus == targetStatus) {
+            throw new BusinessException(ErrorCode.INVALID_SUBSCRIPTION_TRANSITION,
+                    currentStatus.name(), targetStatus.name());
+        }
+
+        boolean isNewMember = memberOpt.isEmpty();
         Member member;
         if(currentStatus.isUpgradeTo(targetStatus)) {
             member = this.handleSubscribe(command, channel, memberOpt, currentStatus, targetStatus);
@@ -61,11 +68,13 @@ class ChangeSubscriptionService implements ChangeSubscriptionUseCase {
 
         if(!getRandomResultPort.getRandomResult()) {
             log.info("csrng returned 0, rolling back subscription change for phoneNumber={}",
-                    mask(command.getPhoneNumber()));
+                    PhoneNumberUtils.mask(command.getPhoneNumber()));
             throw new BusinessException(ErrorCode.SUBSCRIPTION_RANDOM_ROLLBACK);
         }
 
-        updateMemberStatusPort.updateStatus(command.getPhoneNumber(), targetStatus);
+        if(!isNewMember) {
+            updateMemberStatusPort.updateStatus(command.getPhoneNumber(), targetStatus);
+        }
 
         eventPublisher.publishEvent(new SubscriptionHistoryEvent(SubscriptionHistory.builder()
                 .memberId(member.getId())
@@ -77,15 +86,8 @@ class ChangeSubscriptionService implements ChangeSubscriptionUseCase {
                 .build()));
 
         log.info("Subscription changed: phoneNumber={}, channel={}, {} -> {}",
-                mask(command.getPhoneNumber()), channel.getName(), currentStatus, targetStatus);
-    }
-
-
-    private String mask(String phoneNumber) {
-        if(phoneNumber == null) {
-            return "****";
-        }
-        return phoneNumber.replaceAll("(\\d{3})\\d{4}(\\d+)", "$1****$2");
+                PhoneNumberUtils.mask(command.getPhoneNumber()), channel.getName(), currentStatus,
+                targetStatus);
     }
 
 
@@ -100,7 +102,7 @@ class ChangeSubscriptionService implements ChangeSubscriptionUseCase {
                     currentStatus.name(), targetStatus.name());
         }
         return memberOpt.orElseGet(
-                () -> saveMemberPort.save(Member.create(command.getPhoneNumber())));
+                () -> saveMemberPort.save(Member.create(command.getPhoneNumber(), targetStatus)));
     }
 
 

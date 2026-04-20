@@ -38,9 +38,13 @@ class GetSubscriptionHistoryService implements GetSubscriptionHistoryQuery {
                         .build())
                 .toList();
 
+        String summary = histories.isEmpty() ?
+                "구독 이력이 없습니다." :
+                summarizeHistoryPort.summarizeHistory(histories);
+
         return HistoryResponse.builder()
                 .history(historyItems)
-                .summary(summarizeHistoryPort.summarizeHistory(histories))
+                .summary(summary)
                 .build();
     }
 }

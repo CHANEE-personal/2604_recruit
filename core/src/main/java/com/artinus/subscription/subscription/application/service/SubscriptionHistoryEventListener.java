@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import com.artinus.subscription.common.util.PhoneNumberUtils;
 import com.artinus.subscription.subscription.application.port.out.SaveSubscriptionHistoryPort;
 import com.artinus.subscription.subscription.domain.SubscriptionHistoryEvent;
 
@@ -26,9 +27,10 @@ class SubscriptionHistoryEventListener {
         try {
             saveSubscriptionHistoryPort.save(event.getHistory());
         } catch(Exception e) {
+            String maskedPhone = PhoneNumberUtils.mask(event.getHistory()
+                    .getPhoneNumber());
             log.error("Failed to save subscription history: phoneNumber={}, channel={}, {} -> {}",
-                    event.getHistory()
-                            .getPhoneNumber(), event.getHistory()
+                    maskedPhone, event.getHistory()
                             .getChannelName(), event.getHistory()
                             .getPreviousStatus(), event.getHistory()
                             .getNewStatus(), e);

@@ -268,109 +268,6 @@ graph LR
     style SLACK fill: #4A154B, color: #fff, stroke: #2c0b2e
 ```
 
----
-
-## 기술 선택 및 구현 결정 사항
-
-### 헥사고날 아키텍처 (Ports & Adapters)
-
-도메인 로직이 프레임워크·DB·외부 API에 직접 의존하지 않도록 `core` 모듈에 비즈니스 로직을 격리했습니다.
-
-- **Port(인터페이스)** 를 통해 의존 방향을 도메인 안쪽으로만 향하게 제어
-- JPA, Feign, Redis 등 구체 기술은 `infrastructure` 모듈에서만 구현 — 기술 교체 시 도메인 코드 무변경
-- `core` 모듈 단위 테스트 시 DB 없이 Mock Port만으로 빠른 테스트 가능
-
-```
-common       ← 공통 예외, 유틸, 분산락 AOP
-core         ← 도메인, UseCase, Port 인터페이스 (순수 자바)
-infrastructure ← JPA Entity, FeignClient, Redis Adapter (Port 구현체)
-customer-api ← 고객용 REST Controller, 설정
-admin-api    ← 관리자용 REST Controller, 설정
-```
-
----
-
-### 멀티 모듈 구성
-
-단일 JAR로 구성하면 고객 API와 관리자 API 사이에 의도치 않은 빈 노출·경로 공유가 발생합니다.
-
-- `customer-api`(포트 8080) / `admin-api`(포트 8081) 를 별도 애플리케이션으로 분리해 네트워크 레벨 접근 제어 가능
-- 공통 도메인·인프라 코드는 모듈 의존성으로 재사용 — 중복 없이 관리
-- 배포 파이프라인도 모듈별 독립 배포(`deploy-customer-api.yml` / `deploy-admin-api.yml`)
-
----
-
-### Resilience4j CircuitBreaker + Retry (csrng 외부 API 장애 대응)
-
-외부 API(csrng)는 언제든 지연·장애가 발생할 수 있습니다. 단순 재시도만으로는 장애 중 요청이 계속 누적되는 문제가 있습니다.
-
-| 패턴                | 역할                                       |
-|-------------------|------------------------------------------|
-| `@Retry`          | 일시적 오류에 Exponential Backoff 재시도 (최대 3회)  |
-| `@CircuitBreaker` | 연속 실패율 50% 초과 시 서킷 OPEN → 즉시 fallback 반환 |
-
-- try-catch 로 예외를 삼키면 Resilience4j가 실패로 인식하지 못하므로, **어댑터에서 예외를 직접 잡지 않고** 프레임워크가 감지하도록 설계
-- CircuitBreaker fallback 은 설정값(`csrng.fallback-result`)으로 외부화 — 운영 중 롤백 정책 변경 시 재배포 불필요
-
----
-
-### Redisson 분산락 (`@DistributedLock`)
-
-동일 휴대폰번호로 동시에 구독 변경 요청이 오면 둘 다 `NONE` 상태를 읽어 각각 회원 생성을 시도하는 **중복 회원 문제**가 발생합니다.
-
-- `@DistributedLock(key = "#command.phoneNumber")` AOP로 **휴대폰번호 단위 Redis 락** 획득
-- DB UNIQUE 제약으로도 막을 수 있지만 예외 처리가 복잡해지고 재시도 로직이 별도 필요 — 락으로 선제적 직렬화가 더 명확
-- `leaseTime`을 30초로 설정한 이유: csrng 재시도 대기시간(최대 ~7초) + CircuitBreaker 대기 + DB 처리를 합산해 안전 마진 확보
-
----
-
-### `@TransactionalEventListener(AFTER_COMMIT)` + `REQUIRES_NEW`
-
-구독 이력을 같은 트랜잭션에서 저장하면 csrng 랜덤 롤백 시 이력도 함께 롤백되어 **"처리 시도 자체가 기록되지 않는"** 문제가 발생합니다.
-
-- `AFTER_COMMIT`: 메인 트랜잭션이 **성공적으로 커밋된 후에만** 이벤트 실행 → 롤백된 요청은 이력 저장 미호출
-- `REQUIRES_NEW`: AFTER_COMMIT 콜백은 활성 트랜잭션이 없는 상태이므로 신규 트랜잭션을 명시적으로 열어 JPA save가 트랜잭션 컨텍스트 안에서 실행되도록 보장
-- 이력 저장 실패가 메인 비즈니스 로직에 영향을 주지 않도록 이벤트 핸들러 내부에서 예외를 잡아 로그만 기록
-
----
-
-### `@Modifying @Query` JPQL 업데이트 (더블 쿼리 방지)
-
-기존 `updateStatus`가 `findByPhoneNumber` → `entity.setStatus()` → `save()` 패턴이었는데, 서비스 레이어에서 이미 회원을 조회했음에도 **어댑터에서 다시
-SELECT** 가 발생했습니다.
-
-```java
-
-@Modifying(clearAutomatically = true)
-@Query("UPDATE MemberJpaEntity m SET m.subscriptionStatus = :status WHERE m.phoneNumber = :phoneNumber")
-void updateSubscriptionStatus(String phoneNumber, SubscriptionStatus status);
-```
-
-- UPDATE 단건 쿼리로 불필요한 SELECT 제거
-- `clearAutomatically = true`로 1차 캐시 즉시 무효화 → 이후 같은 트랜잭션 내 조회 시 stale 데이터 방지
-- `SaveMemberPort`(신규 회원 저장)와 `UpdateMemberStatusPort`(상태 변경)를 포트 레벨에서 분리 — 책임 명확화
-
----
-
-### MapStruct 매핑
-
-JPA Entity ↔ Domain 객체 변환을 수작업으로 관리하면 필드 추가 시 누락 위험이 있습니다.
-
-- 컴파일 타임에 매핑 코드를 생성하므로 **런타임 리플렉션 없이** 타입 안전 변환
-- Lombok Builder와 함께 사용 시 `@BeanMapping(nullValuePropertyMappingStrategy = IGNORE)` 로 부분 업데이트도 안전하게 처리 가능
-
----
-
-### Flyway DB 마이그레이션
-
-스키마 변경을 코드와 함께 버전 관리합니다.
-
-- `V1__init.sql` → 초기 스키마, `V2__insert_channels.sql` → 채널 기초 데이터 등 순번으로 이력 관리
-- 애플리케이션 기동 시 자동 적용 → 환경별(local/staging/prod) 스키마 불일치 방지
-- `ddl-auto: validate`로 Entity와 실제 스키마 불일치를 기동 시점에 즉시 감지
-
----
-
 ### 배포 흐름 (Blue/Green)
 
 ```mermaid
@@ -415,3 +312,141 @@ graph LR
     style ROLLBACK fill: #2980b9, color: #fff, stroke: #1a5276
     style ALERT fill: #4A154B, color: #fff, stroke: #2c0b2e
 ```
+
+---
+
+## 기술 선택 및 구현 결정 사항
+
+### 헥사고날 아키텍처 (Ports & Adapters)
+
+도메인 로직이 프레임워크·DB·외부 API에 직접 의존하지 않도록 `core` 모듈에 비즈니스 로직을 격리했습니다.
+
+- **Port(인터페이스)** 를 통해 의존 방향을 도메인 안쪽으로만 향하게 제어
+- JPA, Feign, Redis 등 구체 기술은 `infrastructure` 모듈에서만 구현 — 기술 교체 시 도메인 코드 무변경
+- `core` 모듈 단위 테스트 시 DB 없이 Mock Port만으로 빠른 테스트 가능
+
+```
+common         ← 공통 예외, 유틸, 분산락 AOP
+core           ← 도메인, UseCase, Port 인터페이스 (순수 자바)
+infrastructure ← JPA Entity, FeignClient, Redis Adapter (Port 구현체)
+customer-api   ← 고객용 REST Controller, 설정
+admin-api      ← 관리자용 REST Controller, 설정
+```
+
+---
+
+### 멀티 모듈 구성
+
+단일 JAR로 구성하면 고객 API와 관리자 API 사이에 의도치 않은 빈 노출·경로 공유가 발생합니다.
+
+- `customer-api`(포트 8080) / `admin-api`(포트 8081) 를 별도 애플리케이션으로 분리해 네트워크 레벨 접근 제어 가능
+- 공통 도메인·인프라 코드는 모듈 의존성으로 재사용 — 중복 없이 관리
+- 배포 파이프라인도 모듈별 독립 배포(`deploy-customer-api.yml` / `deploy-admin-api.yml`)
+
+---
+
+### Spring Cloud OpenFeign (외부 API 통합)
+
+csrng, OpenAI 두 외부 API를 일관된 방식으로 호출합니다.
+
+- 인터페이스 선언만으로 HTTP 클라이언트 생성 — RestTemplate 대비 보일러플레이트 코드 최소화
+- Resilience4j CircuitBreaker/Retry 어노테이션과 자연스럽게 결합
+- 타임아웃을 API 특성에 맞춰 세분화: csrng(connect 3s / read 3s), LLM(connect 10s / read 30s)
+
+---
+
+### Resilience4j CircuitBreaker + Retry (외부 API 장애 대응)
+
+외부 API(csrng, LLM)는 언제든 지연·장애가 발생할 수 있습니다. 단순 재시도만으로는 장애 중 요청이 계속 누적되는 문제가 있습니다.
+
+| 패턴                | 역할                                       |
+|-------------------|------------------------------------------|
+| `@Retry`          | 일시적 오류에 Exponential Backoff 재시도 (csrng 최대 3회, LLM 최대 2회) |
+| `@CircuitBreaker` | 연속 실패율 50% 초과 시 서킷 OPEN → 즉시 fallback 반환 |
+
+- try-catch 로 예외를 삼키면 Resilience4j가 실패로 인식하지 못하므로, **어댑터에서 예외를 직접 잡지 않고** 프레임워크가 감지하도록 설계
+- CircuitBreaker fallback 은 설정값(`csrng.fallback-result`)으로 외부화 — 운영 중 롤백 정책 변경 시 재배포 불필요
+- LLM fallback은 이력 요약 생성 실패 시 기본 안내 문구 반환으로 구독 조회 자체는 중단되지 않도록 처리
+
+---
+
+### Redisson 분산락 (`@DistributedLock`)
+
+동일 휴대폰번호로 동시에 구독 변경 요청이 오면 둘 다 `NONE` 상태를 읽어 각각 회원 생성을 시도하는 **중복 회원 문제**가 발생합니다.
+
+- `@DistributedLock(key = "#command.phoneNumber")` AOP로 **휴대폰번호 단위 Redis 락** 획득
+- DB UNIQUE 제약으로도 막을 수 있지만 예외 처리가 복잡해지고 재시도 로직이 별도 필요 — 락으로 선제적 직렬화가 더 명확
+- `leaseTime`을 30초로 설정한 이유: csrng 재시도 대기시간(최대 ~7초) + CircuitBreaker 대기 + DB 처리를 합산해 안전 마진 확보
+
+---
+
+### `@TransactionalEventListener(AFTER_COMMIT)` + `REQUIRES_NEW`
+
+구독 이력을 같은 트랜잭션에서 저장하면 csrng 랜덤 롤백 시 이력도 함께 롤백되어 **"처리 시도 자체가 기록되지 않는"** 문제가 발생합니다.
+
+- `AFTER_COMMIT`: 메인 트랜잭션이 **성공적으로 커밋된 후에만** 이벤트 실행 → 롤백된 요청은 이력 저장 미호출
+- `REQUIRES_NEW`: AFTER_COMMIT 콜백은 활성 트랜잭션이 없는 상태이므로 신규 트랜잭션을 명시적으로 열어 JPA save가 트랜잭션 컨텍스트 안에서 실행되도록 보장
+- 이력 저장 실패가 메인 비즈니스 로직에 영향을 주지 않도록 이벤트 핸들러 내부에서 예외를 잡아 로그만 기록 (Graceful Degradation)
+
+---
+
+### `@Modifying @Query` JPQL 업데이트 (더블 쿼리 방지)
+
+기존 `updateStatus`가 `findByPhoneNumber` → `entity.setStatus()` → `save()` 패턴이었는데, 서비스 레이어에서 이미 회원을 조회했음에도 **어댑터에서 다시 SELECT** 가 발생했습니다.
+
+```java
+@Modifying(clearAutomatically = true)
+@Query("UPDATE MemberJpaEntity m SET m.subscriptionStatus = :status WHERE m.phoneNumber = :phoneNumber")
+void updateSubscriptionStatus(String phoneNumber, SubscriptionStatus status);
+```
+
+- UPDATE 단건 쿼리로 불필요한 SELECT 제거
+- `clearAutomatically = true`로 1차 캐시 즉시 무효화 → 이후 같은 트랜잭션 내 조회 시 stale 데이터 방지
+- `SaveMemberPort`(신규 회원 저장)와 `UpdateMemberStatusPort`(상태 변경)를 포트 레벨에서 분리 — 책임 명확화
+
+---
+
+### 공통 예외 처리 및 API 응답 표준화
+
+모든 API 응답을 `ApiResponse<T>` 제네릭 래퍼로 통일합니다.
+
+- `@RestControllerAdvice`로 `BusinessException`, `MethodArgumentNotValidException`, `MissingServletRequestParameterException` 등을 일관된 형태로 변환
+- `{success, message, data}` 구조로 클라이언트 파싱 일관성 확보
+- `ErrorCode` enum으로 에러 코드·HTTP 상태·메시지 키를 한 곳에서 관리 — 에러 추가 시 핸들러 수정 불필요
+
+---
+
+### 다국어 메시지 처리 (i18n)
+
+에러 메시지를 `MessageSource`로 관리합니다.
+
+- `Accept-Language` 헤더 기반으로 한국어 / 영어 메시지 자동 선택
+- 메시지 키(`error.channel_not_found` 등)를 `messages.properties` / `messages_en.properties`에서 관리 — 코드 변경 없이 메시지 수정 가능
+
+---
+
+### MapStruct 매핑
+
+JPA Entity ↔ Domain 객체 변환을 수작업으로 관리하면 필드 추가 시 누락 위험이 있습니다.
+
+- 컴파일 타임에 매핑 코드를 생성하므로 **런타임 리플렉션 없이** 타입 안전 변환
+- Lombok Builder와 함께 사용 시 `@BeanMapping(nullValuePropertyMappingStrategy = IGNORE)` 로 부분 업데이트도 안전하게 처리 가능
+
+---
+
+### Flyway DB 마이그레이션
+
+스키마 변경을 코드와 함께 버전 관리합니다.
+
+- `V1__init.sql` → 초기 스키마, `V2__insert_channels.sql` → 채널 기초 데이터 등 순번으로 이력 관리
+- 애플리케이션 기동 시 자동 적용 → 환경별(local/staging/prod) 스키마 불일치 방지
+- `ddl-auto: validate`로 Entity와 실제 스키마 불일치를 기동 시점에 즉시 감지
+
+---
+
+### Actuator 헬스체크
+
+`/actuator/health` 엔드포인트를 노출해 Blue/Green 배포 흐름과 연결합니다.
+
+- CodeDeploy 배포 시 새 Green Task의 헬스체크 통과 여부로 트래픽 전환 결정
+- `registerHealthIndicator: true`로 Resilience4j CircuitBreaker 상태도 헬스 응답에 포함 — 운영 중 서킷 상태 모니터링 가능
